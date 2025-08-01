@@ -1,5 +1,11 @@
 # Booking API
 
+## Требования
+
+- PHP >= 8.2
+- MySQL >= 8.0
+- Composer >= 2.x
+
 ## Установка
 
 1. Клонировать репозиторий:  
@@ -14,7 +20,7 @@ git clone https://github.com/avlad96/fst.git
 composer install
 ```
 
-3. Создать `.env` файл и настроить его:
+3. Создать `.env` файл и настроить параметры окружения:
 
 ```
 cp .env.example .env
@@ -30,4 +36,12 @@ php artisan key:generate
 
 ```
 php artisan migrate --seed
+```
+
+## Тестирование
+
+Для тестов необходимо настроить отдельный файл окружения .env.testing и выполнить:
+
+```
+php artisan test
 ```
