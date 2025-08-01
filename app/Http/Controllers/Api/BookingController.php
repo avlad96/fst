@@ -32,8 +32,9 @@ class BookingController extends Controller
     public function store(BookingStoreRequest $request): BookingResource
     {
         $slots = $request->input('slots');
-        $slotsSorted = collect($slots)->sortBy('start_time')->values();
 
+        // Проверяем пересечения слотов в текущем запросе
+        $slotsSorted = collect($slots)->sortBy('start_time')->values();
         for ($i = 1; $i < $slotsSorted->count(); $i++) {
             $prevEnd = Carbon::parse($slotsSorted[$i-1]['end_time']);
             $currStart = Carbon::parse($slotsSorted[$i]['start_time']);
@@ -47,15 +48,10 @@ class BookingController extends Controller
             throw ValidationException::withMessages(['message' => 'Slots overlap with existing bookings']);
         }
 
+        // Создаем бронирование и слоты одной транзакцией, чтобы избежать частичного сохранения при ошибке
         $booking = DB::transaction(function () use ($slots) {
             $booking = Booking::create(['user_id' => Auth::id()]);
-
-            foreach ($slots as $slot) {
-                $booking->slots()->create([
-                    'start_time' => $slot['start_time'],
-                    'end_time' => $slot['end_time'],
-                ]);
-            }
+            $booking->slots()->createMany($slots);
 
             return $booking;
         });
