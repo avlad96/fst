@@ -26,7 +26,7 @@ class BookingController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        return BookingResource::collection($user->bookings()->get());
+        return BookingResource::collection($user->bookings()->with('slots')->get());
     }
 
     public function store(BookingStoreRequest $request): BookingResource
